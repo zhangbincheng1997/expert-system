@@ -11,7 +11,12 @@ board = [0, 0, 0,
          0, 0, 0]
 ME = 'X'
 AI = 'Y'
-turn = 'me'
+
+class Position():
+    def __init__(self, x, y, score):
+        self.x = x
+        self.y = y
+        self.score = score
 
 """
 --------------
@@ -29,7 +34,6 @@ turn = 'me'
 036     147     258
 048     246
 """
-
 
 # 胜利条件
 def win(player):
@@ -76,31 +80,31 @@ def move(pos, player):
 # 返回值：[pos_x, pos_y, score]
 def minimax(player, step):
     if step == 0 or win(ME) or win(AI):
-        return [-1, -1, score_for_ai()]  # pos_x pos_y 后面会更新
+        return Position(-1, -1, score_for_ai())  # pos_x pos_y 后面会更新
 
     # 初始化最优值
     from math import inf as infinity
     if player == ME:
-        best = [-1, -1, +infinity]
+        best = Position(-1, -1, +infinity)
     elif player == AI:
-        best = [-1, -1, -infinity]
+        best = Position(-1, -1, -infinity)
 
     for i in range(ROW):
         for j in range(COL):
             if board[i * ROW + j] == 0:  # 试探
                 board[i * ROW + j] = player  # 记录
                 nextp = ME if (player == AI) else AI  # 思考对手下棋
-                score = minimax(nextp, step - 1)  # 继续极大极小值算法
+                P = minimax(nextp, step - 1)  # 继续极大极小值算法
                 board[i * ROW + j] = 0  # 重置
 
-                score[0], score[1] = i, j
+                P.x, P.y = i, j
 
                 if player == ME:  # 极小 min value
-                    if score[2] < best[2]:
-                        best = score
+                    if P.score < best.score:
+                        best = P
                 elif player == AI:  # 极大 max value
-                    if score[2] > best[2]:
-                        best = score
+                    if P.score > best.score:
+                        best = P
 
     return best
 
@@ -114,8 +118,8 @@ def ai_turn():
     if board[5 - 1] == 0:  # 优化：中间有优势
         pos = 5 - 1
     else:  # 极大极小值算法
-        pos_x, pos_y, _ = minimax(AI, step)
-        pos = pos_x * ROW + pos_y
+        P = minimax(AI, step)
+        pos = P.x * ROW + P.y
     move(pos, AI)
     flush()
     render()
@@ -161,14 +165,17 @@ def flush():
 
 
 if __name__ == '__main__':
-    choice = input("请选择棋子类型：'X/Y'，默认'X' >>> ")
+    choice = input("请选择棋子类型：[X/Y]，默认'X' >>> ")
     if choice == 'Y':
         ME = 'Y'
         AI = 'X'
 
-    choice = input("请选择是否先手：'T/F'，默认'T' >>> ")
+    choice = input("请选择是否先手：[T/F]，默认'T' >>> ")
     if choice == 'F':
-        turn = 'ai'
+        choice = False
+    else:
+        choice = True
+    
 
     render()
 
@@ -178,12 +185,11 @@ if __name__ == '__main__':
             print('平手')
             break
 
-        if turn == 'me':
+        if choice:
             me_turn()
-            turn = 'ai'
-        elif turn == 'ai':
+        else:
             ai_turn()
-            turn = 'me'
+        choice = not choice # 轮到对方
 
         if win(ME):
             print('玩家胜利！！！')
