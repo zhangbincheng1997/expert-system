@@ -65,6 +65,7 @@ def topological(rules):
                         ind_list[j] -= 1
     return topo_rules
 
+
 # 反向推理机
 def infer(facts, topo_rules):
     flag = False
@@ -81,6 +82,7 @@ def infer(facts, topo_rules):
     else:
         print('无法推出')
 
+
 # 判断list中所有元素是否都在集合set中
 def list_in_set(list, set):
     for i in list:
@@ -91,6 +93,7 @@ def list_in_set(list, set):
 
 if __name__ == '__main__':
     import collections
+
     rules = collections.OrderedDict()
     P_list, Q_list = load_rule('data.txt')
     for k, v in zip(P_list, Q_list):
@@ -103,12 +106,12 @@ if __name__ == '__main__':
             k = input('请输入添加的特征组合：').strip().split(' ')
             v = input('请输入添加的结论：')
             add_rule(k, v, rules)
-            topo_rules = topological(rules) # 与正向不同，每次都要更新
+            topo_rules = topological(rules)  # 与正向不同，每次都要更新
 
         elif choice == 'del':
             k = input('请输入删除的特征组合：').strip().split(' ')
             del_rule(k, rules)
-            topo_rules = topological(rules) # 与正向不同，每次都要更新
+            topo_rules = topological(rules)  # 与正向不同，每次都要更新
 
         elif choice == 'show':
             for k in rules.keys():

@@ -50,11 +50,11 @@ def del_rule(k, rules):
 
 # 冲突消解
 def resolve(candidate_rule, method=1):
-    if method == 1: # 1. 最长匹配策略
-        return max(candidate_rule, key=lambda x:len(x[0]))
-    elif method == 2: # 2. 最早匹配策略
+    if method == 1:  # 1. 最长匹配策略
+        return max(candidate_rule, key=lambda x: len(x[0]))
+    elif method == 2:  # 2. 最早匹配策略
         return candidate_rule[0]
-    elif method == 3: # 3. 最晚匹配策略
+    elif method == 3:  # 3. 最晚匹配策略
         return candidate_rule[-1]
     else:
         exit(0)
@@ -65,22 +65,22 @@ def infer(facts, rules):
     candidate_rule = []
     visited_rule = []
     flag = False
-    
+
     while True:
         candidate_rule.clear()
-        for rule in rules.items(): # 1. 从问题已有的事实（初始证据）出发，正向使用规则
+        for rule in rules.items():  # 1. 从问题已有的事实（初始证据）出发，正向使用规则
             k, v = rule
-            if list_in_set(k, facts) and rule not in visited_rule: # 2. 当规则的条件部分与已有的事实匹配时，就把该规则作为可用规则放入候选规则队列中
+            if list_in_set(k, facts) and rule not in visited_rule:  # 2. 当规则的条件部分与已有的事实匹配时，就把该规则作为可用规则放入候选规则队列中
                 candidate_rule.append(rule)
                 visited_rule.append(rule)
                 print('规约：{key} ----> {value}'.format(key=k, value=v))
-        
-        if len(candidate_rule) != 0: # 3. 然后通过冲突消解，在候选队列中选择一条规则作为启用规则进行推理，并将其结论放入数据库中，作为下一步推理时的证据
+
+        if len(candidate_rule) != 0:  # 3. 然后通过冲突消解，在候选队列中选择一条规则作为启用规则进行推理，并将其结论放入数据库中，作为下一步推理时的证据
             k, v = resolve(candidate_rule)
             facts.append(v)
             flag = True
             print('冲突消解：{key} ====> {value}\n'.format(key=k, value=v))
-        else: # 4. 如此重复这个过程，直到再无可用规则可被选用或者求得了所要求的解为止
+        else:  # 4. 如此重复这个过程，直到再无可用规则可被选用或者求得了所要求的解为止
             break
 
     if flag:
@@ -99,6 +99,7 @@ def list_in_set(list, set):
 
 if __name__ == '__main__':
     import collections
+
     rules = collections.OrderedDict()
     P_list, Q_list = load_rule('data.txt')
     for k, v in zip(P_list, Q_list):
@@ -121,7 +122,7 @@ if __name__ == '__main__':
 
         elif choice == 'exit':
             exit(0)
-        
+
         else:
             k = input('请输入测试的特征组合：').strip().split(' ')
             infer(k, rules)

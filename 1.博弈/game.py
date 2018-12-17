@@ -12,11 +12,13 @@ board = [0, 0, 0,
 ME = 'X'
 AI = 'Y'
 
+
 class Position():
     def __init__(self, x, y, score):
         self.x = x
         self.y = y
         self.score = score
+
 
 """
 --------------
@@ -34,6 +36,7 @@ class Position():
 036     147     258
 048     246
 """
+
 
 # 胜利条件
 def win(player):
@@ -175,7 +178,6 @@ if __name__ == '__main__':
         choice = False
     else:
         choice = True
-    
 
     render()
 
@@ -189,7 +191,7 @@ if __name__ == '__main__':
             me_turn()
         else:
             ai_turn()
-        choice = not choice # 轮到对方
+        choice = not choice  # 轮到对方
 
         if win(ME):
             print('玩家胜利！！！')

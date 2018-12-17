@@ -1,4 +1,14 @@
-## 规则
+# 推理机
+https://zh.wikipedia.org/wiki/推理机
+
+## 正向推理机
+https://en.wikipedia.org/wiki/Forward_chaining
+
+## 反向推理机
+https://en.wikipedia.org/wiki/Backward_chaining
+
+## 数据集
+![alt text](topo.png "title")
 1. 有毛的动物是哺乳类；
 2. 有奶的动物是哺乳类；
 3. 有羽毛的动物是鸟类；
@@ -15,8 +25,8 @@
 14. 不会飞善游泳黑白色的鸟是企鹅；
 15. 善飞的鸟是信天翁。
 
-#### 课本上的说明，并不适用于Python
-"""
+## 伪代码：课本上的说明，并不适用于Python
+```
 # 1. recall
 # (recall fact)
 # 判断变量fact中的一个事实是否在表facts中，若是，recall返回值是fact中的事实；否则，返回nil
@@ -71,4 +81,4 @@ def step_forward(rules):
 # 若曾找到一条可用规则对facts进行过一次扩充，则deduce返回t；否则，deduce返回nil
 def deduce(facts):
     pass
-"""
+```
