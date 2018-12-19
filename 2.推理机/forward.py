@@ -16,6 +16,12 @@
 """
 
 
+class Rule():
+    def __init__(self, feature, fact):
+        self.feature = feature
+        self.fact = fact
+
+
 # 加载规则
 def load_rule(path):
     P_list = []
@@ -32,26 +38,28 @@ def load_rule(path):
 
 # 添加规则
 def add_rule(k, v, rules):
-    if tuple(k) in rules.keys():
-        print('特征已在数据库')
-    else:
-        rules[tuple(k)] = v
-        print('特征成功添加 >>> %s ----> %s' % (k, v))
+    for rule in rules:
+        if set(k) == set(rule.feature):
+            print('特征已在数据库')
+            return
+    rules.append(Rule(k, v))
+    print('特征成功添加 >>> %s ----> %s' % (k, v))
 
 
 # 删除规则
 def del_rule(k, rules):
-    if tuple(k) in rules.keys():
-        rules.pop(tuple(k))
-        print('特征成功删除 >>> %s' % k)
-    else:
-        print('特征不在数据库')
+    for rule in rules:
+        if set(k) == set(rule.feature):
+            rules.remove(rule)
+            print('特征成功删除 >>> %s' % k)
+            return
+    print('特征不在数据库')
 
 
 # 冲突消解
 def resolve(candidate_rule, method=1):
     if method == 1:  # 1. 最长匹配策略
-        return max(candidate_rule, key=lambda x: len(x[0]))
+        return max(candidate_rule, key=lambda x: len(x.feature))
     elif method == 2:  # 2. 最早匹配策略
         return candidate_rule[0]
     elif method == 3:  # 3. 最晚匹配策略
@@ -68,19 +76,22 @@ def infer(facts, rules):
 
     while True:
         candidate_rule.clear()
-        for rule in rules.items():  # 1. 从问题已有的事实（初始证据）出发，正向使用规则
-            k, v = rule
-            if list_in_set(k, facts) and rule not in visited_rule:  # 2. 当规则的条件部分与已有的事实匹配时，就把该规则作为可用规则放入候选规则队列中
+        # 1. 从问题已有的事实（初始证据）出发，正向使用规则
+        for rule in rules:
+            # 2. 当规则的条件部分与已有的事实匹配时，就把该规则作为可用规则放入候选规则队列中
+            if list_in_set(rule.feature, facts) and rule not in visited_rule:
                 candidate_rule.append(rule)
                 visited_rule.append(rule)
-                print('规约：{key} ----> {value}'.format(key=k, value=v))
+                print('规约：{key} ----> {value}'.format(key=rule.feature, value=rule.fact))
 
-        if len(candidate_rule) != 0:  # 3. 然后通过冲突消解，在候选队列中选择一条规则作为启用规则进行推理，并将其结论放入数据库中，作为下一步推理时的证据
-            k, v = resolve(candidate_rule)
-            facts.append(v)
+        # 3. 然后通过冲突消解，在候选队列中选择一条规则作为启用规则进行推理，并将其结论放入数据库中，作为下一步推理时的证据
+        if len(candidate_rule) != 0:
+            result = resolve(candidate_rule)
+            facts.append(result.fact)
             flag = True
-            print('冲突消解：{key} ====> {value}\n'.format(key=k, value=v))
-        else:  # 4. 如此重复这个过程，直到再无可用规则可被选用或者求得了所要求的解为止
+            print('冲突消解：{key} ====> {value}\n'.format(key=result.feature, value=result.fact))
+        # 4. 如此重复这个过程，直到再无可用规则可被选用或者求得了所要求的解为止
+        else:
             break
 
     if flag:
@@ -98,10 +109,8 @@ def list_in_set(list, set):
 
 
 if __name__ == '__main__':
-    import collections
-
-    rules = collections.OrderedDict()
-    P_list, Q_list = load_rule('data.txt')
+    rules = []
+    P_list, Q_list = load_rule('data/data.txt')
     for k, v in zip(P_list, Q_list):
         add_rule(k, v, rules)
 
@@ -117,8 +126,8 @@ if __name__ == '__main__':
             del_rule(k, rules)
 
         elif choice == 'show':
-            for k in rules.keys():
-                print('%s ----> %s' % (k, rules[k]))
+            for rule in rules:
+                print('%s ----> %s' % (rule.feature, rule.fact))
 
         elif choice == 'exit':
             exit(0)

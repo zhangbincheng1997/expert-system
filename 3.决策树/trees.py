@@ -16,8 +16,7 @@ def calcShannonEnt(dataSet):
         shannonEnt -= prob * log(prob, 2)  # H=−∑p(xi)log(p(xi))
     return shannonEnt
 
-
-# 以axis为界，将特征值等于value的数据集划分成两个数据集
+# 按照给定特征划分数据集，选择所占列中等于选择值的项
 def splitDataSet(dataSet, axis, value):
     retDataSet = []
     for featVec in dataSet:
@@ -49,7 +48,7 @@ def chooseBestFeatureToSplit(dataSet):
     return bestFeature
 
 
-# 辅助函数：实例数量最大的类作为该结点的类标记
+# 辅助函数：采用多数判决的方法决定该节点的标签
 def majorityCnt(classList):
     classCount = {}
     for vote in classList:
@@ -62,16 +61,16 @@ def majorityCnt(classList):
 # ID3
 def createTree(dataSet, labels):
     classList = [example[-1] for example in dataSet]  # 获取标签列表
-    if classList.count(classList[0]) == len(classList):  # 全部属于同一类型
-        return classList[0]  # 只有这种类型
-    if len(dataSet[0]) == 1:  # 只有一种类型
-        return majorityCnt(classList)  # 返回标签(例如Y/N)
+    if classList.count(classList[0]) == len(classList):  # 若数据集中所有实例属于同一类Ck，则为单节点树，并将Ck作为该节点的类标记
+        return classList[0]
+    if len(dataSet[0]) == 0: # 若特征集为空集，则为单节点树，并将数据集中实例数最大的类Ck作为该节点的类标记
+        return majorityCnt(classList)  # 返回占多数的标签
     bestFeat = chooseBestFeatureToSplit(dataSet)  # 寻找最佳特征，用来划分数据集
     bestFeatLabel = labels[bestFeat]
     myTree = {bestFeatLabel: {}}
     del (labels[bestFeat])
     featValues = [example[bestFeat] for example in dataSet]  # 获取最佳特征列表
-    uniqueVals = set(featValues)  # 特征去重(例如a1 a2 a3)
+    uniqueVals = set(featValues)  # 特征去重
     for value in uniqueVals:  # 对每个最佳特征，分割成若干个非空子集
         subLabels = labels[:]
 

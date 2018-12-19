@@ -1,14 +1,16 @@
 # 推理机
+
+1. 推理机
 https://zh.wikipedia.org/wiki/推理机
 
-## 正向推理机
+2. 正向推理机
 https://en.wikipedia.org/wiki/Forward_chaining
 
-## 反向推理机
+3. 反向推理机
 https://en.wikipedia.org/wiki/Backward_chaining
 
 ## 数据集
-![alt text](topo.png "title")
+![alt text](data/topo.png "title")
 1. 有毛的动物是哺乳类；
 2. 有奶的动物是哺乳类；
 3. 有羽毛的动物是鸟类；

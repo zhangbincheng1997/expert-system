@@ -1,6 +1,11 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+class Rule():
+    def __init__(self, feature, fact):
+        self.feature = feature
+        self.fact = fact
+
 
 # 加载规则
 def load_rule(path):
@@ -18,28 +23,30 @@ def load_rule(path):
 
 # 添加规则
 def add_rule(k, v, rules):
-    if tuple(k) in rules.keys():
-        print('特征已在数据库')
-    else:
-        rules[tuple(k)] = v
-        print('特征成功添加 >>> %s ----> %s' % (k, v))
+    for rule in rules:
+        if set(k) == set(rule.feature):
+            print('特征已在数据库')
+            return
+    rules.append(Rule(k, v))
+    print('特征成功添加 >>> %s ----> %s' % (k, v))
 
 
 # 删除规则
 def del_rule(k, rules):
-    if tuple(k) in rules.keys():
-        rules.pop(tuple(k))
-        print('特征成功删除 >>> %s' % k)
-    else:
-        print('特征不在数据库')
+    for rule in rules:
+        if set(k) == set(rule.feature):
+            rules.remove(rule)
+            print('特征成功删除 >>> %s' % k)
+            return
+    print('特征不在数据库')
 
 
 # 拓扑排序
 def topological(rules):
     # 规则
-    topo_rules = collections.OrderedDict()
-    P_list = list(rules.keys())
-    Q_list = list(rules.values())
+    topo_rules = []
+    P_list = [rule.feature for rule in rules]
+    Q_list = [rule.fact for rule in rules]
 
     # 计算入度
     ind_list = []
@@ -57,7 +64,7 @@ def topological(rules):
 
         for i, ind in enumerate(ind_list):
             if ind == 0:
-                topo_rules[tuple(P_list[i])] = Q_list[i]
+                topo_rules.append(Rule(P_list[i], Q_list[i]))
                 ind_list[i] = -1
                 # 更新入度
                 for j, P in enumerate(P_list):
@@ -69,13 +76,13 @@ def topological(rules):
 # 反向推理机
 def infer(facts, topo_rules):
     flag = False
-    for key in topo_rules.keys():
+    for rule in topo_rules:
         # 如果所有规则都在输入中
-        if list_in_set(key, facts):
+        if list_in_set(rule.feature, facts):
             # 添加推导出的条件
-            facts.append(topo_rules[key])
+            facts.append(rule.fact)
             flag = True
-            print('{key} ----> {value}\n'.format(key=key, value=facts[-1]))
+            print('{key} ----> {value}\n'.format(key=rule.feature, value=rule.fact))
 
     if flag:
         print('最终推出 ----> %s' % facts[-1])
@@ -92,10 +99,8 @@ def list_in_set(list, set):
 
 
 if __name__ == '__main__':
-    import collections
-
-    rules = collections.OrderedDict()
-    P_list, Q_list = load_rule('data.txt')
+    rules = []
+    P_list, Q_list = load_rule('data/data.txt')
     for k, v in zip(P_list, Q_list):
         add_rule(k, v, rules)
     topo_rules = topological(rules)
@@ -114,8 +119,8 @@ if __name__ == '__main__':
             topo_rules = topological(rules)  # 与正向不同，每次都要更新
 
         elif choice == 'show':
-            for k in rules.keys():
-                print('%s ----> %s' % (k, rules[k]))
+            for rule in rules:
+                print('%s ----> %s' % (rule.feature, rule.fact))
 
         elif choice == 'exit':
             exit(0)
